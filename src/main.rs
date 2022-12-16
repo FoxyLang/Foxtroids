@@ -79,6 +79,7 @@ struct Shape {
     color: Color,
     scale: f64,
     kind: ShapeType,
+    bound: bool,
 }
 impl Shape {
     fn new(x: f64, y: f64, rot: f64, scale: f64, color: Color, shape: ShapeType) -> Shape {
@@ -95,7 +96,11 @@ impl Shape {
             color: color,
             scale: scale,
             kind: shape,
+            bound: false,
         }
+    }
+    fn set_bound(&mut self) {
+        self.bound = true;
     }
     fn fire(&self) -> Shape {
         Shape {
@@ -117,6 +122,7 @@ impl Shape {
             color: self.color,
             scale: self.scale / 4.0,
             kind: ShapeType::Bullet,
+            bound: false,
         }
     }
     fn find_verticies(&mut self) {
@@ -209,101 +215,103 @@ impl Shape {
         }
     }
     fn bound(&mut self, x: f64, y: f64, canvas: &mut Canvas<Window>) {
-        let mut dummies: Vec<Shape> = Vec::new();
-        if self.pos.x <= self.scale {
-            dummies.push(Shape::new(
-                self.pos.x + x,
-                self.pos.y,
-                self.rot,
-                self.scale,
-                self.color,
-                ShapeType::Dummy,
-            ));
-            dummies.push(Shape::new(
-                self.pos.x + x,
-                self.pos.y + y,
-                self.rot,
-                self.scale,
-                self.color,
-                ShapeType::Dummy,
-            ));
-            if self.pos.x <= 0.0 {
-                self.pos.x = self.pos.x + x;
-            }
-        }
-        if self.pos.x >= x - self.scale {
-            dummies.push(Shape::new(
-                self.pos.x - x,
-                self.pos.y,
-                self.rot,
-                self.scale,
-                self.color,
-                ShapeType::Dummy,
-            ));
-            dummies.push(Shape::new(
-                self.pos.x - x,
-                self.pos.y - y,
-                self.rot,
-                self.scale,
-                self.color,
-                ShapeType::Dummy,
-            ));
-            if self.pos.x >= x {
-                self.pos.x = self.pos.x - x;
-            }
-        }
-        if self.pos.y <= self.scale {
-            dummies.push(Shape::new(
-                self.pos.x,
-                self.pos.y + y,
-                self.rot,
-                self.scale,
-                self.color,
-                ShapeType::Dummy,
-            ));
-            dummies.push(Shape::new(
-                self.pos.x - x,
-                self.pos.y + y,
-                self.rot,
-                self.scale,
-                self.color,
-                ShapeType::Dummy,
-            ));
-            if self.pos.y <= 0.0 {
-                self.pos.y = self.pos.y + y;
-            }
-        }
-        if self.pos.y >= y - self.scale {
-            dummies.push(Shape::new(
-                self.pos.x,
-                self.pos.y - y,
-                self.rot,
-                self.scale,
-                self.color,
-                ShapeType::Dummy,
-            ));
-            dummies.push(Shape::new(
-                self.pos.x + x,
-                self.pos.y - y,
-                self.rot,
-                self.scale,
-                self.color,
-                ShapeType::Dummy,
-            ));
-            if self.pos.y >= y {
-                self.pos.y = self.pos.y - y;
-            }
-        }
-        for dummy in dummies.iter_mut() {
-            for i in 0..self.v.len() {
-                let difference =
-                    FloatPoint::new(dummy.pos.x - self.pos.x, dummy.pos.y - self.pos.y);
-                dummy.v.push_front(FloatPoint::new(
-                    self.v[i].x + difference.x,
-                    self.v[i].y + difference.y,
+        if self.bound == true {
+            let mut dummies: Vec<Shape> = Vec::new();
+            if self.pos.x <= self.scale {
+                dummies.push(Shape::new(
+                    self.pos.x + x,
+                    self.pos.y,
+                    self.rot,
+                    self.scale,
+                    self.color,
+                    ShapeType::Dummy,
                 ));
+                dummies.push(Shape::new(
+                    self.pos.x + x,
+                    self.pos.y + y,
+                    self.rot,
+                    self.scale,
+                    self.color,
+                    ShapeType::Dummy,
+                ));
+                if self.pos.x <= 0.0 {
+                    self.pos.x = self.pos.x + x;
+                }
             }
-            dummy.draw(canvas);
+            if self.pos.x >= x - self.scale {
+                dummies.push(Shape::new(
+                    self.pos.x - x,
+                    self.pos.y,
+                    self.rot,
+                    self.scale,
+                    self.color,
+                    ShapeType::Dummy,
+                ));
+                dummies.push(Shape::new(
+                    self.pos.x - x,
+                    self.pos.y - y,
+                    self.rot,
+                    self.scale,
+                    self.color,
+                    ShapeType::Dummy,
+                ));
+                if self.pos.x >= x {
+                    self.pos.x = self.pos.x - x;
+                }
+            }
+            if self.pos.y <= self.scale {
+                dummies.push(Shape::new(
+                    self.pos.x,
+                    self.pos.y + y,
+                    self.rot,
+                    self.scale,
+                    self.color,
+                    ShapeType::Dummy,
+                ));
+                dummies.push(Shape::new(
+                    self.pos.x - x,
+                    self.pos.y + y,
+                    self.rot,
+                    self.scale,
+                    self.color,
+                    ShapeType::Dummy,
+                ));
+                if self.pos.y <= 0.0 {
+                    self.pos.y = self.pos.y + y;
+                }
+            }
+            if self.pos.y >= y - self.scale {
+                dummies.push(Shape::new(
+                    self.pos.x,
+                    self.pos.y - y,
+                    self.rot,
+                    self.scale,
+                    self.color,
+                    ShapeType::Dummy,
+                ));
+                dummies.push(Shape::new(
+                    self.pos.x + x,
+                    self.pos.y - y,
+                    self.rot,
+                    self.scale,
+                    self.color,
+                    ShapeType::Dummy,
+                ));
+                if self.pos.y >= y {
+                    self.pos.y = self.pos.y - y;
+                }
+            }
+            for dummy in dummies.iter_mut() {
+                for i in 0..self.v.len() {
+                    let difference =
+                        FloatPoint::new(dummy.pos.x - self.pos.x, dummy.pos.y - self.pos.y);
+                    dummy.v.push_front(FloatPoint::new(
+                        self.v[i].x + difference.x,
+                        self.v[i].y + difference.y,
+                    ));
+                }
+                dummy.draw(canvas);
+            }
         }
     }
     fn direct(&mut self, e: &sdl2::EventPump) {
@@ -372,8 +380,32 @@ fn rand_f64(x: f64, y: f64) -> f64 {
     rng
 }
 fn create_asteroid(x_min: f64, x_max: f64, y_min: f64, y_max: f64) -> Shape {
-    let rpoint = FloatPoint::new(rand_f64(x_min, x_max), rand_f64(y_min, y_max));
-    let rrot = rand_f64(0.0, TAU);
+    let enter = rand::thread_rng().gen_range(0..=3);
+    let mut rpoint = FloatPoint::new(0.0, 0.0);
+    let mut rot = 0.0;
+    if enter == 0 {
+        rpoint = FloatPoint::new(rand_f64(-x_max / 2.0, x_min), rand_f64(-y_max / 2.0, y_min));
+        rot = ((x_max / 2.0 - rpoint.x) / (y_max / 2.0 - rpoint.y)).atan();
+    } else if enter == 1 {
+        rpoint = FloatPoint::new(
+            rand_f64(x_max, x_max + x_max / 2.0),
+            rand_f64(-y_max / 2.0, y_min),
+        );
+        rot = PI + ((x_max / 2.0 - rpoint.x) / (y_max / 2.0 - rpoint.y)).atan();
+    } else if enter == 2 {
+        rpoint = FloatPoint::new(
+            rand_f64(x_max, x_max + x_max / 2.0),
+            rand_f64(y_max, y_max + y_max / 2.0),
+        );
+        rot = PI + ((x_max / 2.0 - rpoint.x) / (y_max / 2.0 - rpoint.y)).atan();
+    } else if enter == 3 {
+        rpoint = FloatPoint::new(
+            rand_f64(-x_max / 2.0, x_min),
+            rand_f64(y_max, y_max + y_max / 2.0),
+        );
+        rot = ((x_max / 2.0 - rpoint.x) / (y_max / 2.0 - rpoint.y)).atan();
+    }
+    let rrot = rot;
     let rscale = rand_f64(10.0, 80.0);
     Shape {
         old: Old {
@@ -388,6 +420,7 @@ fn create_asteroid(x_min: f64, x_max: f64, y_min: f64, y_max: f64) -> Shape {
         color: Color::RGB(255, 255, 255),
         scale: rscale,
         kind: ShapeType::Asteroid(0.0),
+        bound: false,
     }
 }
 fn split_asteroid(vector: &mut Vec<Shape>, index: usize) {
@@ -407,6 +440,7 @@ fn split_asteroid(vector: &mut Vec<Shape>, index: usize) {
         color: vector[index].color,
         scale: vector[index].scale - scale_diff,
         kind: ShapeType::Asteroid(0.0),
+        bound: true,
     };
     let new2 = Shape {
         old: Old {
@@ -421,6 +455,7 @@ fn split_asteroid(vector: &mut Vec<Shape>, index: usize) {
         color: vector[index].color,
         scale: scale_diff,
         kind: ShapeType::Asteroid(0.0),
+        bound: true,
     };
     vector.push(new1);
     vector.push(new2);
@@ -430,14 +465,15 @@ fn destroy(tester: &mut Vec<Shape>, to_destroy: &Shape) -> bool {
     for i in 0..tester.len() {
         if (tester[i].pos.x - to_destroy.pos.x).powf(2.0)
             + (tester[i].pos.y - to_destroy.pos.y).powf(2.0)
-            <= tester[i].scale.powf(2.0)
+            <= ((tester[i].scale * 0.8) + (to_destroy.scale * 0.8)).powf(2.0)
         {
             destroy = true;
         }
     }
     destroy
 }
-fn collide(tester: &mut Vec<Shape>, testee: &mut Vec<Shape>) {
+fn collide(tester: &mut Vec<Shape>, testee: &mut Vec<Shape>, score: u32) -> u32 {
+    let mut score = score;
     if tester.len() > 0 && testee.len() > 0 {
         'remove: loop {
             for i in 0..tester.len() {
@@ -446,6 +482,7 @@ fn collide(tester: &mut Vec<Shape>, testee: &mut Vec<Shape>) {
                         + (tester[i].pos.y - testee[j].pos.y).powf(2.0)
                         <= tester[i].scale.powf(2.0)
                     {
+                        score = add_score(&mut tester[i], score);
                         split_asteroid(tester, i);
                         tester.remove(i);
                         testee.remove(j);
@@ -458,12 +495,19 @@ fn collide(tester: &mut Vec<Shape>, testee: &mut Vec<Shape>) {
             }
         }
     }
+    score
 }
-
+fn add_score(shape: &mut Shape, score: u32) -> u32 {
+    let score = score + shape.scale as u32;
+    score
+}
 pub fn main() {
+    let mut to_create = 0;
+    let mut loop_iter = 0;
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
     let audio_subsystem = sdl_context.audio().unwrap();
+    let mut score: u32 = 0;
     let desired_spec = AudioSpecDesired {
         freq: Some(60000),
         channels: Some(1), // mono
@@ -502,6 +546,7 @@ pub fn main() {
         Color::RGB(255, 255, 255),
         ShapeType::Ship,
     );
+    player.set_bound();
     let mut alive = true;
     let mut bullets: Vec<Shape> = Vec::new();
     let mut asteroids: Vec<Shape> = Vec::new();
@@ -559,6 +604,7 @@ pub fn main() {
                 if fire_delay == 0 {
                     bullets.push(player.fire());
                     player.color(255, 100, 0);
+                    //shoot_sound.resume();
                 } else {
                     player.color(
                         255,
@@ -573,6 +619,7 @@ pub fn main() {
                     150 + 105 / (15 - fire_delay),
                     0 + 255 / (15 - fire_delay),
                 );
+                //shoot_sound.pause();
                 fire_delay = (fire_delay + 1) % 15;
             }
             player.bound(res_x, res_y, &mut canvas);
@@ -592,7 +639,22 @@ pub fn main() {
             }
         }
 
+        if loop_iter == 0 {
+            to_create += 1;
+            if to_create == 4 {
+                asteroids.push(create_asteroid(0.0, res_x, 0.0, res_y));
+                to_create = 0;
+            }
+        }
+
         for asteroid in asteroids.iter_mut() {
+            if asteroid.pos.x <= res_x - asteroid.scale
+                && asteroid.pos.x >= asteroid.scale
+                && asteroid.pos.y <= res_y - asteroid.scale
+                && asteroid.pos.y >= asteroid.scale
+            {
+                asteroid.bound = true;
+            }
             asteroid.pos.x =
                 asteroid.pos.x + (asteroid.scale / 16.0 * (asteroid.rot).cos()) * asteroid.s;
             asteroid.pos.y =
@@ -609,7 +671,8 @@ pub fn main() {
             );
             bullets[i].draw(&mut canvas);
         }
-        collide(&mut asteroids, &mut bullets);
+        score = collide(&mut asteroids, &mut bullets, score);
+        println!("score: {}", score);
         if destroy(&mut asteroids, &player) {
             alive = false;
         }
@@ -632,14 +695,17 @@ pub fn main() {
         }
 
         canvas.present();
+        println!("{loop_iter}");
+        loop_iter += 1;
+        if loop_iter >= 60 {
+            loop_iter -= 60;
+        }
         let end = ::std::time::Instant::now();
         let delta_time = end - start;
         let frame_dur = Duration::new(0, 1_000_000_000u32 / 60);
-
         if delta_time <= frame_dur {
             let sleep = frame_dur - delta_time;
             ::std::thread::sleep(sleep);
-            println!("{:?}", sleep);
         }
     }
 }
