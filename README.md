@@ -5,7 +5,7 @@ A simple asteroids alike game I am building to practice my programming and gamem
 # To Play
 
   -Make sure you have rust installed <br>
-  -Clone the repository
-  -Open your command prompt
-  -Use the command prompt to goto the cloned repository's directory
-  -Type "cargo run"
+  -Clone the repository <br>
+  -Open your command prompt <br>
+  -Use the command prompt to goto the cloned repository's directory <br>
+  -Type "cargo run" <br>
