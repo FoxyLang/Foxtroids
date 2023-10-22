@@ -2,6 +2,8 @@
 
 A simple asteroids alike game I am building to practice my programming and gamemaking skills.
 
+![alt text](images/Foxtroids.PNG)
+
 # To Play
 
   -Make sure you have rust installed <br>
